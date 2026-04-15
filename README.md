@@ -218,9 +218,209 @@ Well-cleaned data leads to confident decisions.
 
 ---
 
-## 👨‍💻 Author
+---
 
-**Manjunatha B N**
+# 📊 Exploratory Data Analysis: Tech Layoffs (2020–2023)
+
+## 🔍 Project Objective
+
+After cleaning the dataset, this phase focuses on uncovering **real-world insights** behind global tech layoffs.
+
+Instead of relying on headlines, this analysis uses SQL-based EDA techniques such as:
+
+* Common Table Expressions (CTEs)
+* Rolling totals
+* Aggregations
+* Ranking functions
+
+👉 Goal: Identify patterns, trends, and structural shifts in the tech industry.
 
 ---
 
+## 📅 Dataset Scope
+
+* **Time Period:** March 2020 – March 2023
+* **Total Layoffs Analyzed:** ~383,000
+* **Global Coverage:** Multiple countries and industries
+
+---
+
+## 📈 Key Insights
+
+---
+
+### 🚨 1. Layoffs Exploded in Early 2023
+
+The most shocking trend is the **speed of layoffs in 2023**.
+
+* **2022 Total:** ~160,000 layoffs
+* **First 3 months of 2023:** ~125,000 layoffs
+
+👉 In just 90 days, 2023 nearly matched the entire previous year.
+
+**Insight:**
+This is not a slow decline—it’s a **rapid contraction phase**.
+
+---
+
+### 🧊 2. 2021 Was an Artificial “Calm Period”
+
+* **2020:** ~80,000 layoffs (pandemic shock)
+* **2021:** ~15,000 layoffs (sharp drop)
+
+Despite global uncertainty, layoffs temporarily decreased.
+
+👉 This created a **false sense of stability**.
+
+**Insight:**
+2021 delayed the correction that exploded in 2022–2023.
+
+---
+
+### 🏢 3. Big Tech Was Hit Hardest (Not Startups)
+
+Contrary to popular belief:
+
+* Largest layoffs came from **Post-IPO companies**
+* Not early-stage startups
+
+Major companies impacted include:
+
+* Amazon
+* Google
+* Meta
+
+👉 Example: A single **12,000 employee layoff** by Google.
+
+**Insight:**
+This was not startup failure—it was **industry-wide restructuring**.
+
+---
+
+### 🌍 4. U.S. and Consumer Sector Took the Biggest Hit
+
+#### 🌎 By Geography:
+
+* 🇺🇸 United States → ~256,000 layoffs (highest by far)
+* Followed by India, Netherlands
+
+#### 🏬 By Industry:
+
+* Consumer & Retail → most affected
+* Manufacturing, Energy → relatively stable
+
+**Insight:**
+Customer-facing industries were the most vulnerable during disruptions.
+
+---
+
+### 💀 5. Some Companies Didn’t Survive at All
+
+Filtering for:
+
+```sql
+percentage_laid_off = 1
+```
+
+👉 Means **100% workforce laid off**
+
+Examples:
+
+* Quibi
+* BlockFi
+* Volt Bank
+
+**Insight:**
+Even heavily funded companies can collapse completely.
+
+---
+
+## 🧠 SQL Techniques Used
+
+### 📌 Rolling Total (Layoff Trend Over Time)
+
+```sql
+WITH monthly_layoffs AS (
+    SELECT 
+        DATE_FORMAT(date, '%Y-%m') AS month,
+        SUM(total_laid_off) AS layoffs
+    FROM layoffs_staging2
+    GROUP BY month
+)
+SELECT 
+    month,
+    SUM(layoffs) OVER (ORDER BY month) AS rolling_total
+FROM monthly_layoffs;
+```
+
+---
+
+### 📌 Top Companies by Layoffs (Per Year)
+
+```sql
+SELECT *
+FROM (
+    SELECT 
+        company,
+        YEAR(date) AS year,
+        SUM(total_laid_off) AS total,
+        DENSE_RANK() OVER (
+            PARTITION BY YEAR(date)
+            ORDER BY SUM(total_laid_off) DESC
+        ) AS rank_num
+    FROM layoffs_staging2
+    GROUP BY company, year
+) ranked
+WHERE rank_num <= 5;
+```
+
+---
+
+## 📊 Key Takeaways
+
+* Layoffs are **accelerating, not stabilizing**
+* 2021 masked underlying instability
+* Large corporations drove the majority of job cuts
+* Economic impact is concentrated geographically and sector-wise
+* Some companies experienced **complete shutdowns**
+
+---
+
+## ⚠️ Limitations
+
+* Dataset includes **reported layoffs only**
+* Likely excludes:
+
+  * Small businesses
+  * Unreported job losses
+
+👉 Actual impact may be significantly higher
+
+---
+
+## 🔮 Final Insight
+
+> The data suggests this is not a temporary disruption—but a structural shift.
+
+The tech industry is moving toward:
+
+* Leaner operations
+* Cost optimization
+* Reduced over-hiring
+
+---
+
+## 🚀 Next Steps
+
+* Build dashboards (Power BI / Tableau)
+* Perform time-series forecasting
+* Compare layoffs vs funding trends
+* Add visualizations using Python (Matplotlib / Seaborn)
+
+---
+
+👨‍💻 Author
+
+Manjunatha B N
+
+---
